@@ -1,0 +1,12 @@
+﻿import cors from "cors";
+import express from "express";
+import morgan from "morgan";
+import { apiRoutes } from "./routes/index.js";
+import { errorMiddleware } from "./middleware/errorMiddleware.js";
+import { env } from "./utils/env.js";
+export const app = express();
+app.use(cors({ origin: env.CORS_ORIGIN }));
+app.use(express.json({ limit: "2mb" }));
+app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use("/api", apiRoutes);
+app.use(errorMiddleware);

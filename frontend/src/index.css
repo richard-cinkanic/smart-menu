@@ -1,0 +1,11 @@
+/* pre toasty */
+.moj-vlastny-toast {
+  background-color: #2B160E !important;
+  color: #2B160E !important;
+  border-radius: 12px !important;
+  padding: 12px 20px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+

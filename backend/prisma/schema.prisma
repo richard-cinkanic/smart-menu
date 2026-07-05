@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+  PAID
+}
+
+enum CustomerRole {
+  CUSTOMER
+  ADMIN
+}
+
+model Restaurant {
+  id         String     @id @default(uuid())
+  name       String
+  address    String
+  createdAt  DateTime   @default(now())
+  tables     Table[]
+  categories Category[]
+}
+
+model Table {
+  id           String     @id @default(uuid())
+  number       Int
+  qrCode       String
+  qrTargetUrl  String?
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orders       Order[]
+
+  @@unique([restaurantId, number])
+}
+
+model Category {
+  id           String     @id @default(uuid())
+  name         String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  products     Product[]
+
+  @@unique([restaurantId, name])
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  price       Decimal     @db.Decimal(10, 2)
+  imageUrl    String
+  available   Boolean     @default(true)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+}
+
+model Customer {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  role         CustomerRole @default(CUSTOMER)
+  createdAt    DateTime     @default(now())
+  orders       Order[]
+  devices      Device[]
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  customerId String?
+  tableId    String?
+  totalPrice Decimal     @db.Decimal(10, 2)
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  table      Table?      @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  items      OrderItem[]
+  notifications OrderNotification[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+}
+
+// link mezi objednavkou a telefonom
+model OrderNotification {
+  id          String  @id @default(uuid())
+  deviceId    String
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  device      Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+// trackovanie zariadenia
+model Device {
+  id                String   @id @default(uuid())
+  deviceId          String   @unique  // Generated na klientovi
+  customerId        String?
+  customer          Customer? @relation(fields: [customerId], references: [id])
+  pushToken         String?  // Pre web push notifications
+  isNotificationEnabled Boolean @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  orders            OrderNotification[]
+}
+

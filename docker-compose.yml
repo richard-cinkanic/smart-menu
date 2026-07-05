@@ -1,0 +1,41 @@
+﻿services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartmenuai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: smartmenu
+      POSTGRES_PASSWORD: smartmenu_password
+      POSTGRES_DB: smartmenuai
+    ports:
+      - "5432:5432"
+    volumes:
+      - smartmenuai-postgres:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartmenu -d smartmenuai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    container_name: smartmenuai-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://smartmenu:smartmenu_password@postgres:5432/smartmenuai?schema=public
+      JWT_SECRET: smartmenuai_docker_development_jwt_secret_2026
+      CORS_ORIGIN: http://localhost:5173
+      PUBLIC_APP_URL: http://localhost:5173
+    ports:
+      - "4000:4000"
+
+volumes:
+  smartmenuai-postgres:
+
