@@ -20,6 +20,6 @@ const parsedEnv = envSchema.parse(process.env);
 
 export const env = {
   ...parsedEnv,
-  // Production deployments are read-only unless explicitly configured otherwise.
-  DEMO_MODE: parsedEnv.DEMO_MODE ?? parsedEnv.NODE_ENV === "production"
+  // Deployments are read-only unless write access is explicitly enabled.
+  DEMO_MODE: parsedEnv.DEMO_MODE ?? true
 };
