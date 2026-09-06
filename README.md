@@ -79,9 +79,8 @@ npm run dev
 
 ## Demo Accounts
 
-- Read-only admin demo: `admin@smartmenu.ai` / `admin123`
-
-The public production demo allows visitors to explore the administrator dashboard, but blocks changes to products, categories, tables, QR codes, and order statuses. Local development remains fully editable by default.
+- Admin: `admin@smartmenu.ai` / `Password123!`
+- Customer: `guest@smartmenu.ai` / `Password123!`
 
 ## API Base URL
 

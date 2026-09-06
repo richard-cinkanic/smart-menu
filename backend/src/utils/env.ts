@@ -12,14 +12,6 @@ const envSchema = z.object({
   PUBLIC_APP_URL: z.string().default("http://localhost:5173"),
   VAPID_PUBLIC_KEY: z.string().optional().default(""),
   VAPID_PRIVATE_KEY: z.string().optional().default(""),
-  VAPID_MAILTO: z.string().default("mailto:admin@smartmenu.local"),
-  DEMO_MODE: z.enum(["true", "false"]).transform((value) => value === "true").optional()
+  VAPID_MAILTO: z.string().default("mailto:admin@smartmenu.local")
 });
-
-const parsedEnv = envSchema.parse(process.env);
-
-export const env = {
-  ...parsedEnv,
-  // Production deployments are read-only unless explicitly configured otherwise.
-  DEMO_MODE: parsedEnv.DEMO_MODE ?? parsedEnv.NODE_ENV === "production"
-};
+export const env = envSchema.parse(process.env);
