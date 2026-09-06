@@ -33,6 +33,7 @@
       JWT_SECRET: smartmenuai_docker_development_jwt_secret_2026
       CORS_ORIGIN: http://localhost:5173
       PUBLIC_APP_URL: http://localhost:5173
+      DEMO_MODE: "false"
     ports:
       - "4000:4000"
 

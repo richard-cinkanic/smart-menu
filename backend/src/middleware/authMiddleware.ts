@@ -1,5 +1,6 @@
 ﻿import type { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../utils/auth.js";
+import { env } from "../utils/env.js";
 
 declare global { namespace Express { interface Request { user?: { customerId: string; email: string; role: string } } } }
 
@@ -18,4 +19,12 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction) {
     if (req.user?.role !== "ADMIN") return res.status(403).json({ message: "Admin access required" });
     next();
   });
+}
+
+export function blockDemoWrites(_req: Request, res: Response, next: NextFunction) {
+  if (env.DEMO_MODE) {
+    return res.status(403).json({ message: "The public demo is read-only." });
+  }
+
+  next();
 }
